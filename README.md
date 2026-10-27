@@ -54,8 +54,8 @@ heuristic_control = HeuristicGoalRing(20)
 sqrt_pid_control = SqrtPIDGoalRing(20)
 ```
 
-Importing the module only defines classes. It uses NumPy and does not import
-Matplotlib, consume random draws, run a demonstration, or create plots. Plotting
+Importing the module only defines classes and coordinate helpers. It uses NumPy
+and does not import Matplotlib, consume random draws, run a demonstration, or create plots. Plotting
 helpers and demonstration loops remain in the notebook.
 
 | Class | Original notebook section | Control convention |
@@ -72,8 +72,12 @@ Connection sizes and wraparound use `N`; the convolution kernel requires at
 least seven neurons. The historical `/100` PID calculation followed by the
 heuristic override, `/20` square-root PID input, and `/50` scales are preserved.
 They are fixed experimental constants, **not** a validated normalization for
-arbitrary `N`. Choosing units, gain scaling, or the preferred controller needs a
-separate scientific specification and evaluation.
+arbitrary `N`. [Controller units and scaling](CONTROLLER_UNITS.md) defines the
+existing index, current and tick conventions, gives manual examples for `N=20`
+and `N=40`, and separates algebraic gain conversion from scientific calibration.
+For explicit coordinate conversion, `ring_index_to_angle(index, N)` returns
+wrapped radians and `angle_to_ring_index(angle, N)` returns a wrapped continuous
+index. Neither helper changes controller behavior or rounds to a neuron.
 
 ## Check the model definitions
 
@@ -87,7 +91,8 @@ scientific results, or require a display. The original six regressions retain
 their coverage of reset state, floating-point lateral inhibition, non-twenty
 controller size, explicit controller input, and angle wraparound. Additional
 checks cover standalone imports, distinct notebook bindings, the heuristic
-override, and the preserved square-root PID scales. GitHub Actions runs the
+override, coordinate seams, finite goals, and the preserved square-root PID
+scales at different ring sizes. GitHub Actions runs the
 same checks.
 
 Stored notebook outputs have been preserved and were not regenerated after the
@@ -96,8 +101,9 @@ plots as results of the current code.
 
 ## Remaining work
 
-- Specify controller units and gain normalization across `N` before comparing
-  the three preserved variants. No preferred controller has been selected.
+- Validate any proposed angular gain normalization across `N` before comparing
+  the three preserved variants. The documented units describe the current
+  implementation; no preferred controller or calibrated gains have been selected.
 - Define evaluation metrics and random seeds before comparing tracking or memory
   performance. The current demonstrations alone do not establish stability.
 - Decide whether the simple SC transformation is only a visualization or a

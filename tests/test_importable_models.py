@@ -29,8 +29,15 @@ assert 'matplotlib' not in sys.modules
 assert before[0] == after[0]
 np.testing.assert_array_equal(before[1], after[1])
 assert before[2:] == after[2:]
-for name in can_models.__all__:
+class_names = (
+    'BrownianThreshold', 'RingAttractor', 'PIDController',
+    'CurrentControlledRing', 'HeuristicGoalRing', 'SqrtPIDGoalRing',
+)
+for name in class_names:
     assert isinstance(getattr(can_models, name), type), name
+for name in ('ring_index_to_angle', 'angle_to_ring_index'):
+    assert name in can_models.__all__
+    assert callable(getattr(can_models, name)), name
 """
         with tempfile.TemporaryDirectory() as directory:
             shutil.copyfile(ROOT / "can_models.py", Path(directory) / "can_models.py")
